@@ -39,6 +39,7 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.Method;
 import org.apache.hc.core5.http.NotImplementedException;
 import org.apache.hc.core5.http.ProtocolException;
+import org.apache.hc.core5.http.RequestHeaderFieldsTooLargeException;
 import org.apache.hc.core5.http.config.Http1Config;
 import org.apache.hc.core5.http.impl.DefaultContentLengthStrategy;
 import org.apache.hc.core5.http.io.entity.StringEntity;
@@ -334,6 +335,40 @@ class TestDefaultBHttpServerConnection {
         Assertions.assertEquals(1, conn.getEndpointDetails().getResponseCount());
         final String s = new String(outStream.toByteArray(), StandardCharsets.US_ASCII);
         Assertions.assertEquals("HTTP/1.1 200 OK\r\nServer: test\r\n\r\n", s);
+    }
+
+    @Test
+    void testReadRequestHeadDefaultMaxHeaderCount() throws Exception {
+        final StringBuilder buf = new StringBuilder("GET / HTTP/1.1\r\n");
+        for (int i = 0; i < 99; i++) {
+            buf.append("X-Header-").append(i).append(": stuff\r\n");
+        }
+        Mockito.when(socket.getInputStream()).thenReturn(
+                new ByteArrayInputStream((buf + "\r\n").getBytes(StandardCharsets.US_ASCII)));
+        conn.bind(socket);
+        final ClassicHttpRequest request = conn.receiveRequestHeader();
+        Assertions.assertEquals(99, request.getHeaders().length);
+
+        buf.append("X-Header-99: stuff\r\n\r\n");
+        final DefaultBHttpServerConnection conn2 = new DefaultBHttpServerConnection("http", Http1Config.DEFAULT);
+        final Socket socket2 = Mockito.mock(Socket.class);
+        Mockito.when(socket2.getInputStream()).thenReturn(
+                new ByteArrayInputStream(buf.toString().getBytes(StandardCharsets.US_ASCII)));
+        conn2.bind(socket2);
+        Assertions.assertThrows(RequestHeaderFieldsTooLargeException.class, conn2::receiveRequestHeader);
+    }
+
+    @Test
+    void testReadRequestHeadDefaultMaxLineLength() throws Exception {
+        final StringBuilder value = new StringBuilder();
+        for (int i = 0; i < 8192; i++) {
+            value.append('a');
+        }
+        final String s = "GET / HTTP/1.1\r\nX-Long: " + value + "\r\n\r\n";
+        Mockito.when(socket.getInputStream()).thenReturn(
+                new ByteArrayInputStream(s.getBytes(StandardCharsets.US_ASCII)));
+        conn.bind(socket);
+        Assertions.assertThrows(RequestHeaderFieldsTooLargeException.class, conn::receiveRequestHeader);
     }
 
 }
