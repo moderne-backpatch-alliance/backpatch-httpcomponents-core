@@ -1,0 +1,21 @@
+schema: osera-patch-evidence/0.1.0
+producer: moderne
+release: 5.3.6.1-backpatch-00001
+baseline: v5.3.6+backpatch.baseline
+fixes:
+  - cve: CVE-2026-54399
+    upstream_fix_url: https://github.com/apache/httpcomponents-core/commit/d96a00fec9b2e19f8005e35681df5f6cd6e21a9e
+    advisory_url: https://nvd.nist.gov/vuln/detail/CVE-2026-54399
+    patch_commit_url: https://github.com/moderne-backpatch-alliance/backpatch-httpcomponents-core/commit/a7e9037
+    basis: backport
+    artifacts:
+      - org.apache.httpcomponents.core5:httpcore5
+    note: New in this release; ported onto 5.3.6; fixed at 5.3.6.1-backpatch-00001 (backpatch-httpcomponents-core@a7e9037).
+tests:
+  commit: a7e903765386eacba8b15fac335e06fa895491ed
+  command: JAVA_HOME=<jdk-8> mvn -B -Dproject.build.outputTimestamp=2025-09-17T00:00:00Z -pl httpcore5,httpcore5-h2 -am test
+  runtime: Azul Zulu 8.0.382 (Java 1.8.0_382), Apache Maven 3.9.16, macOS aarch64
+  report: httpcore5-5.3.6.1-backpatch-00001-tests.zip
+  report_sha256: 5af285fa26db694fcdf27f61db2fb20086876253cf64a2870f4bd2f00d9083a9
+  result: pass
+  note: the full suites of the two modules the line changes at the tested commit, 1346 tests run, 0 failed, httpcore5 1204 and httpcore5-h2 142; the regression tests for CVE-2026-54399 are TestDefaultBHttpServerConnection testReadRequestHeadDefaultMaxHeaderCount and testReadRequestHeadDefaultMaxLineLength
