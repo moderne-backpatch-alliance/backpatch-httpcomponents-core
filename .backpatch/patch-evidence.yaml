@@ -1,6 +1,6 @@
 schema: osera-patch-evidence/0.1.0
 producer: moderne
-release: 5.3.6.1-backpatch-00003
+release: 5.3.6.1-backpatch-00004
 baseline: v5.3.6+backpatch.baseline
 fixes:
   - cve: CVE-2026-54399
@@ -20,9 +20,9 @@ fixes:
       - org.apache.httpcomponents.core5:httpcore5-h2
     note: Carried from 5.3.6.1-backpatch-00002; ported onto 5.3.6; fixed at 5.3.6.1-backpatch-00002 (backpatch-httpcomponents-core@f201575).
 tests:
-  commit: 9af8b8969bb917db32ae9f4cfba512fedf80529d
+  commit: 882754e715b4a4c32b59de7a8554a434e5068263
   command: none in this repository
   runtime: none, no build or test ran for this release
   report: carried, see the evidence of the release named in the note
   result: pass
-  note: "this release is a tooling update, it carries no new fix, nothing ran here; its test provenance is tooling-2026-11-03-httpcore5-5.3: a tooling update of moderne-backpatch-alliance/backpatch-httpcomponents-core at v5.3.6.1-backpatch-00002, whose .backpatch/patch-evidence.yaml says what ran"
+  note: "this release is a tooling update, it carries no new fix, nothing ran here; its test provenance is tooling-2026-11-05-httpcore5-5.3: a tooling update of moderne-backpatch-alliance/backpatch-httpcomponents-core at v5.3.6.1-backpatch-00003, whose .backpatch/patch-evidence.yaml says what ran"
